@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload</title>
+    <script>
+        function updateProgress(percentage) {
+            var progressBar = document.getElementById("progress-bar");
+            progressBar.style.width = percentage + "%";
+            progressBar.innerHTML = percentage + "%";
+        }
+
+        function uploadFile() {
+            var formData = new FormData();
+            var fileInput = document.getElementById("file-input");
+            formData.append("file", fileInput.files[0]);
+
+            var xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function (e) {
+                if (e.lengthComputable) {
+                    var percentage = (e.loaded / e.total) * 100;
+                    updateProgress(percentage);
+                }
+            });
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 302) {
+                    // Upload completed, redirect to the confirmation page
+                    window.location.href = xhr.getResponseHeader("Location");
+                }
+            };
+
+            xhr.open("POST", "/upload");
+            xhr.send(formData);
+        }
+    </script>
+</head>
+<body>
+    <h1>Upload a File</h1>
+    <form>
+        <input type="file" id="file-input" required><br>
+        <input type="button" value="Upload" onclick="uploadFile()">
+    </form>
+    <div class="progress">
+        <div id="progress-bar" class="progress-bar" style="width: 0%;">0%</div>
+    </div>
+</body>
+</html>
